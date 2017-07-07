@@ -1,5 +1,5 @@
 # Optimal Transport
-This repository contains the implementation of the algorithms described in my, Valentin Hartmann's, bachelor thesis and in the joint paper with Dominic Schuhmacher. That is the computation and visualization of the (semi-discrete) optimal transport for the Euclidean cost function from a continuous to a discrete measure.
+This repository contains the implementation of the algorithms described in my, Valentin Hartmann's, bachelor [thesis](https://arxiv.org/abs/1706.07403) and in the joint [paper](https://arxiv.org/abs/1706.07650) with Dominic Schuhmacher. That is the computation and visualization of the (semi-discrete) optimal transport for the Euclidean cost function from a continuous to a discrete measure.
 
 In the folder [opt_transport](opt_transport) you can find the program that computes the optimal weight vector and the Wasserstein distance for two given measures whereas the folder [visualization](visualization) is dedicated to the additively weighted Voronoi diagrams. It comprises C++ code to generate the data necessary for drawing a Voronoi diagram for a set of points with associated weights and a MATLAB script which uses this data to carry out the job of the actual drawing.
 
