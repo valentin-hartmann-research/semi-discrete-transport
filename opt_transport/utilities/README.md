@@ -13,7 +13,7 @@ Open a shell and switch to this folder. Enter
 
     g++ create_sites_file.cpp -o create_sites_file
 
-to create the program `opt_transport`.
+to create the program `create_sites_file`.
 
 
 ## Usage
