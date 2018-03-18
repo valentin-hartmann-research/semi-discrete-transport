@@ -185,7 +185,7 @@ lbfgsfloatval_t Source::evaluate(
     std::map<std::pair<int/*source*/, int/*target*/>, double/*mass*/> transportPlan;
 
     // same as target->getPoints() but with the VertexHandles belonging to the points;
-    // used for faster acces to the indeces
+    // used for faster access to the indices
     std::map<VertexHandle/*corresponding VertexHandle*/, int/*index*/> targetHandles;
 
     ApoGraph* graph = createApoGraph(x, &targetHandles);
@@ -193,7 +193,7 @@ lbfgsfloatval_t Source::evaluate(
     // the cell in which the left neighbor of the current square lies
     VertexHandle leftCell;
     // the cell in which the top neighbor of the current square lies
-    // (for the case that we reached started at the beginning of a new row)
+    // (for the case that we start at the beginning of a new row)
     VertexHandle topCell = NULL;
     // the cell in which the current square lies
     VertexHandle currCell;
@@ -203,7 +203,7 @@ lbfgsfloatval_t Source::evaluate(
     // recomputed in every iteration
     int refinedRows = refinement * rows;
     int refinedCols = refinement * cols;
-    // the source measure's support is normalized to be conained in [0,1]x[0,1]
+    // the source measure's support is normalized to be contained in [0,1]x[0,1]
     double normalizingFactor = std::max(refinedRows, refinedCols);
     double pixelSize = 1 / normalizingFactor;
     double pixelSizeHalf = pixelSize / 2;
@@ -312,7 +312,7 @@ ApoGraph* Source::createApoGraph(
     Point p(target->getPoints()[i].first, target->getPoints()[i].second);
     Site s(p, x[i]);
     VertexHandle vertexCreated = graph->insert(s);
-    // otherwise the vertex is not visible and therefore won't be the neareast
+    // otherwise the vertex is not visible and therefore won't be the nearest
     // neighbor of any point
     if (vertexCreated != VertexHandle(NULL)) {
       (*targetHandles)[vertexCreated] = i;
