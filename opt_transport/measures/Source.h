@@ -80,7 +80,7 @@ class Source {
     constexpr static double EPS = 5e-2;
 
     // the linesearch algorithm used for the optimization process
-    const static int LINESEARCH = LBFGS_LINESEARCH_BACKTRACKING_WOLFE;
+    const static int LINESEARCH = LBFGS_LINESEARCH_BACKTRACKING_ARMIJO;
 
     // the maximum number of trials for the line search
     const static int MAX_LINESEARCH = 20;
