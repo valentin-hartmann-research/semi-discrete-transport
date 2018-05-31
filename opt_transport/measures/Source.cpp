@@ -186,14 +186,14 @@ lbfgsfloatval_t Source::evaluate(
 
     // same as target->getPoints() but with the VertexHandles belonging to the points;
     // used for faster access to the indices
-    std::map<VertexHandle/*corresponding VertexHandle*/, int/*index*/> targetHandles;
+    std::map<Point/*center of the Voronoi cell*/, int/*index*/> targetHandles;
 
     ApoGraph* graph = createApoGraph(x, &targetHandles);
 
     // the cell in which the left neighbor of the current square lies
     VertexHandle leftCell;
     // the cell in which the top neighbor of the current square lies
-    // (for the case that we start at the beginning of a new row)
+    // (for the case that we reached started at the beginning of a new row)
     VertexHandle topCell = NULL;
     // the cell in which the current square lies
     VertexHandle currCell;
@@ -221,11 +221,11 @@ lbfgsfloatval_t Source::evaluate(
         }
 
         if (filename == NULL) {
-          // the index of currCell
-          int currIndex = targetHandles[currCell];
-
           // the center of currCell
           Point currCenter = currCell->site().point();
+
+          // the index of currCell
+          int currIndex = targetHandles[currCenter];
 
           // The expression in the index can't be simplified since it relies on
           // rounding down.
@@ -244,7 +244,7 @@ lbfgsfloatval_t Source::evaluate(
               currCenter.x(), currCenter.y(), pixelSizeHalf);
         } else {
           int source = ((refinedRows - 1 - i)/refinement)*cols + j/refinement;
-          int target = targetHandles[currCell];
+          int target = targetHandles[currCell->site().point()];
           double mass = refinedPixelMasses[source];
           transportPlan[std::make_pair(source, target)] += mass;
         }
@@ -303,7 +303,7 @@ lbfgsfloatval_t Source::evaluate(
 
 ApoGraph* Source::createApoGraph(
   const lbfgsfloatval_t* const x,
-  std::map<VertexHandle/*corresponding VertexHandle*/,
+  std::map<Point/*center of the Voronoi cell*/,
   int/*index*/>* const targetHandles)
   {
   ApoGraph* graph = new ApoGraph();
@@ -315,7 +315,7 @@ ApoGraph* Source::createApoGraph(
     // otherwise the vertex is not visible and therefore won't be the nearest
     // neighbor of any point
     if (vertexCreated != VertexHandle(NULL)) {
-      (*targetHandles)[vertexCreated] = i;
+      (*targetHandles)[vertexCreated->site().point()] = i;
     }
   }
 

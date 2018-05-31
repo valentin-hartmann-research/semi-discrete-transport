@@ -161,7 +161,7 @@ class Source {
      */
     ApoGraph* createApoGraph(
       const lbfgsfloatval_t* const x,
-      std::map<VertexHandle/*corresponding VertexHandle*/,
+      std::map<Point/*center of the Voronoi cell*/,
       int/*index*/>* const targetHandles);
 
 
