@@ -39,7 +39,7 @@ Target::Target(
   const int cols,
   const std::vector<double>& masses,
   const double accMass)
-  : grid(true), masses(masses) {
+  : masses(masses), grid(true) {
     // the masses are normalized such that the accumulated mass is 1
     for (std::vector<double>::iterator it = this->masses.begin(); it != this->masses.end(); ++it) {
       *it = *it / accMass;
