@@ -351,8 +351,9 @@ void _computeWeightVector(
   }
 
   // the start weights of \nu_L
-  lbfgsfloatval_t* startWeights = lbfgs_malloc(coarsening.back().second.size());
-  for (int i = 0; i < coarsening.back().second.size(); ++i) {
+  int supportSizeNuL = coarsening.back().first->getPoints().size();
+  lbfgsfloatval_t* startWeights = lbfgs_malloc(supportSizeNuL);
+  for (int i = 0; i < supportSizeNuL; ++i) {
     startWeights[i] = 0;
   }
 
