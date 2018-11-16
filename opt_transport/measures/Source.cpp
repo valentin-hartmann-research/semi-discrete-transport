@@ -23,8 +23,9 @@ Source::Source(
   const std::vector<double>& pixelMasses,
   const int rows,
   const int cols,
-  const double accPixelMass)
-  : rows(rows), cols(cols)
+  const double accPixelMass,
+  const double REGULARIZATION_STRENGTH)
+  : rows(rows), cols(cols), REGULARIZATION_STRENGTH(REGULARIZATION_STRENGTH)
   {
     initLbfgs();
     constructFromVector(pixelMasses, accPixelMass);
@@ -33,8 +34,9 @@ Source::Source(
 Source::Source(
   const std::vector<double>& pixelMasses,
   const int rows,
-  const int cols)
-  : rows(rows), cols(cols)
+  const int cols,
+  const double REGULARIZATION_STRENGTH)
+  : rows(rows), cols(cols), REGULARIZATION_STRENGTH(REGULARIZATION_STRENGTH)
   {
     // the accumulated mass of the pixels, i.e. \mu(R^2)
     double accPixelMass = 0;
@@ -134,17 +136,7 @@ int Source::progress(
   {
     wasserstein = wassersteinUpdate;
 
-    double mistransported = 0;
-    for (int i = 0; i < n; ++i) {
-      if (g[i] < 0) {
-        mistransported -= g[i];
-      } else {
-        mistransported += g[i];
-      }
-    }
-    // Mistransported mass gets counted twice: Once were it is missing and once
-    // were it is in surplus.
-    mistransported /= 2;
+    double mistransported = computeMistransported(x, g, n);
 
     #ifdef PRINT_PROGRESS
     printf("Iteration %d:\n", k);
@@ -265,15 +257,7 @@ lbfgsfloatval_t Source::evaluate(
     delete graph;
 
     #ifdef STORE_INTERMEDIATE_RESULTS
-    double mistransported = 0;
-    for (int i = 0; i < n; ++i) {
-      if (g[i] < 0) {
-        mistransported -= g[i];
-      } else {
-        mistransported += g[i];
-      }
-    }
-    mistransported /= 2;
+    double mistransported = computeMistransported(x, g, n);
     if (mistransported < minMistransported) {
       minMistransported = mistransported;
       if (minWeights) {
@@ -285,6 +269,11 @@ lbfgsfloatval_t Source::evaluate(
       }
     }
     #endif
+
+    for (int i = 0; i < n; i++) {
+      g[i] += REGULARIZATION_STRENGTH * 2 * x[i];
+      phi += REGULARIZATION_STRENGTH * pow(x[i], 2);
+    }
 
     // double factor = 1;
     // phi += x[0]>0 ? factor * x[0] : -factor * x[0];
@@ -335,6 +324,26 @@ double Source::distIntegral(
     u1l2 = normPlus(u1, l2), u1u2 = normPlus(u1, u2);
     return primitive(u1, u1l2, u1u2, l2, u2) - primitive(l1, l1l2, l1u2, l2, u2);
 }
+
+double Source::computeMistransported(
+  const lbfgsfloatval_t *x,
+  const lbfgsfloatval_t *g,
+  int n) {
+    double mistransported = 0;
+    for (int i = 0; i < n; ++i) {
+      double without_regularizer = g[i] - REGULARIZATION_STRENGTH * 2 * x[i];
+      if (without_regularizer < 0) {
+        mistransported -= without_regularizer;
+      } else {
+        mistransported += without_regularizer;
+      }
+    }
+    // Mistransported mass gets counted twice: Once were it is missing and once
+    // were it is in surplus.
+    mistransported /= 2;
+
+    return mistransported;
+  }
 
 double Source::primitive(
   double pos,

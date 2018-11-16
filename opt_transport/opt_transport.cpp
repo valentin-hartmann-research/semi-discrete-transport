@@ -71,7 +71,8 @@ void _computeWeightVector(
   std::string targetPath,
   std::string weightsPath,
   std::string transportPlanPath,
-  double normalizingFactor);
+  double normalizingFactor,
+  double regularizationStrength);
 
 /*
  * @param refinement:         the refinement ratio for the source measure
@@ -87,6 +88,9 @@ void _computeWeightVector(
  * @param weightsPath:        the file the weights vector should be printed to
  * @param transportPlanPath:  the file the transport plan should be printed to;
  *                            if omitted, the transport plan isn't printed
+ * @param regularizationStrength:  the factor with which the L2-summand for
+ *                            stabilizing the optimization is multiplied
+ *                            higher value -> more stable but less precise
  */
 void computeWeightVector(
   int refinement,
@@ -95,7 +99,8 @@ void computeWeightVector(
   std::string targetPath,
   std::string weightsPath,
   std::string transportPlanPath,
-  double normalizingFactor) {
+  double normalizingFactor,
+  double regularizationStrength) {
     _computeWeightVector(
       refinement,
       targetReduction,
@@ -103,7 +108,8 @@ void computeWeightVector(
       targetPath,
       weightsPath,
       transportPlanPath,
-      normalizingFactor);
+      normalizingFactor,
+      regularizationStrength);
   }
 void computeWeightVector(
   int refinement,
@@ -111,7 +117,8 @@ void computeWeightVector(
   std::string sourcePath,
   std::string targetPath,
   std::string weightsPath,
-  double normalizingFactor) {
+  double normalizingFactor,
+  double regularizationStrength) {
     _computeWeightVector(
       refinement,
       targetReduction,
@@ -119,7 +126,8 @@ void computeWeightVector(
       targetPath,
       weightsPath,
       std::string(),
-      normalizingFactor);
+      normalizingFactor,
+      regularizationStrength);
   }
 void computeWeightVector(
   int refinement,
@@ -127,7 +135,8 @@ void computeWeightVector(
   std::string sourcePath,
   std::string targetPath,
   std::string weightsPath,
-  std::string transportPlanPath) {
+  std::string transportPlanPath,
+  double regularizationStrength) {
     _computeWeightVector(
       refinement,
       targetReduction,
@@ -135,14 +144,16 @@ void computeWeightVector(
       targetPath,
       weightsPath,
       transportPlanPath,
-      -1);
+      -1,
+      regularizationStrength);
   }
 void computeWeightVector(
   int refinement,
   int targetReduction,
   std::string sourcePath,
   std::string targetPath,
-  std::string weightsPath) {
+  std::string weightsPath,
+  double regularizationStrength) {
     _computeWeightVector(
       refinement,
       targetReduction,
@@ -150,7 +161,8 @@ void computeWeightVector(
       targetPath,
       weightsPath,
       std::string(),
-      -1);
+      -1,
+      regularizationStrength);
   }
 
 /*
@@ -238,7 +250,7 @@ int main(int argc, char* argv[]) {
 
   bool targetAsList;
 
-  if (argc < 5) {
+  if (argc < 6) {
     printUsageHint();
     return -1;
   } else {
@@ -258,8 +270,16 @@ int main(int argc, char* argv[]) {
 
   std::string sourcePath = argv[2];
   std::string targetPath = argv[3];
+
+  std::istringstream regularizationStrengthStream(argv[argc - 1]);
+  double regularizationStrength;
+  if (!(regularizationStrengthStream >> regularizationStrength)) {
+    printUsageHint();
+    return -1;
+  }
+
   if (targetAsList) {
-    if (argc < 6) {
+    if (argc < 7) {
       printUsageHint();
       return -1;
     } else {
@@ -270,31 +290,31 @@ int main(int argc, char* argv[]) {
         return -1;
       }
       std::string weightsPath = argv[5];
-      if (argc == 6) {
+      if (argc == 7) {
         computeWeightVector(refinement, targetReduction, sourcePath, targetPath,
-          weightsPath, normalizingFactor);
+          weightsPath, normalizingFactor, regularizationStrength);
       } else {
         std::string transportPlanPath = argv[6];
         computeWeightVector(refinement, targetReduction, sourcePath, targetPath,
-          weightsPath, transportPlanPath, normalizingFactor);
+          weightsPath, transportPlanPath, normalizingFactor, regularizationStrength);
       }
     }
   } else {
     std::string weightsPath = argv[4];
     if (argc == 5) {
       computeWeightVector(refinement, targetReduction, sourcePath, targetPath,
-        weightsPath);
+        weightsPath, regularizationStrength);
     } else {
       std::string transportPlanPath = argv[5];
       computeWeightVector(refinement, targetReduction, sourcePath, targetPath,
-        weightsPath, transportPlanPath);
+        weightsPath, transportPlanPath, regularizationStrength);
     }
   }
 }
 
 
 void printUsageHint() {
-  printf("Usage: opt_transport <-l/-g> <source> <target> [<normalizing factor for list target>] <weights> [<transport plan>]\n");
+  printf("Usage: opt_transport <-l/-g> <source> <target> [<normalizing factor for list target>] <weights> [<transport plan>] <regularization strength>\n");
 }
 
 void _computeWeightVector(
@@ -304,7 +324,8 @@ void _computeWeightVector(
   std::string targetPath,
   std::string weightsPath,
   std::string transportPlanPath,
-  double normalizingFactor)
+  double normalizingFactor,
+  double regularizationStrength)
   {
 
   bool targetAsList;
@@ -316,7 +337,7 @@ void _computeWeightVector(
 
   GridMeasureData* sourceData = readGridFile(sourcePath);
   Source source(sourceData->masses, sourceData->rows, sourceData->cols,
-    sourceData->accMass);
+    sourceData->accMass, regularizationStrength);
 
   MeasureData* targetData;
   Target* target;

@@ -83,11 +83,16 @@ class Source {
     const static int LINESEARCH = LBFGS_LINESEARCH_BACKTRACKING_ARMIJO;
 
     // the maximum number of trials for the line search
-    const static int MAX_LINESEARCH = 20;
+    const static int MAX_LINESEARCH = 200;
 
     // the number of previous iteration results used to approximate the inverse
     // hessian matrix
     const static int NUM_CORRECTIONS = 6;
+
+    // the factor with which the L2-summand for stabilizing the optimization is
+    // multiplied
+    // higher value -> more stable but less precise
+    const double REGULARIZATION_STRENGTH;
 
     /*
      * @param pixelMasses:    the pixel's masses, i.e., colors
@@ -99,11 +104,13 @@ class Source {
       const std::vector<double>& pixelMasses,
       const int rows,
       const int cols,
-      const double accPixelMass);
+      const double accPixelMass,
+      const double REGULARIZATION_STRENGTH);
     Source(
       const std::vector<double>& pixelMasses,
       const int rows,
-      const int cols);
+      const int cols,
+      const double REGULARIZATION_STRENGTH);
 
     ~Source();
 
@@ -239,6 +246,18 @@ class Source {
     static double euclideanDist(double a1, double a2, double b1, double b2) {
       return normPlus(a1 - b1, a2 - b2);
     }
+
+    /*
+     * @param x: the weight vector
+     * @param g: the gradient of Phi
+     * @param n: the length of the weight and gradient vector
+     * @return: the amount of mistransported mass for the current transport
+     * partition
+     */
+    double computeMistransported(
+      const lbfgsfloatval_t *x,
+      const lbfgsfloatval_t *g,
+      int n);
 
     /*
      * @param pos:          the position at which the primitive is computed
