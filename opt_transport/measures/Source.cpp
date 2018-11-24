@@ -101,9 +101,10 @@ int Source::optimize(
     }
 
     this->target = target;
+    int numTargetPoints = target->getPoints().size();
 
     if (refinementRatio > 0) {
-      double refinementFactor = refinementRatio * target->getPoints().size() / (double) pixelMasses.size();
+      double refinementFactor = refinementRatio * numTargetPoints / (double) pixelMasses.size();
       refinement = ceil(sqrt(refinementFactor));
 
       // normalize the pixelMasses
@@ -120,7 +121,17 @@ int Source::optimize(
 
     weights = startWeights;
 
-    return lbfgs(target->getPoints().size(), weights, NULL, _evaluate, _progress, this, params);
+    int lbfgsReturn;
+    if (numTargetPoints < 10) {
+      // For small instances Wolfe works better.
+      params->linesearch = LBFGS_LINESEARCH_BACKTRACKING_WOLFE;
+      lbfgsReturn = lbfgs(numTargetPoints, weights, NULL, _evaluate, _progress, this, params);
+      params->linesearch = LINESEARCH;
+    } else {
+      lbfgsReturn = lbfgs(numTargetPoints, weights, NULL, _evaluate, _progress, this, params);
+    }
+
+    return lbfgsReturn;
 }
 
 int Source::progress(
