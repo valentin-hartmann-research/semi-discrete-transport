@@ -27,7 +27,7 @@ To go from a source and a target measure to the Voronoi diagram inducing the opt
 First compile all programs as described. Then open a shell and enter the following:
 
         cd <root of this repository>
-        opt_transport/opt_transport -l opt_transport/samples/mu.txt opt_transport/samples/nu.txt 3 weights.txt
+        opt_transport/opt_transport -l opt_transport/samples/mu.txt opt_transport/samples/nu.txt 3 weights.txt 0
         opt_transport/utilities/create_sites_file opt_transport/samples/nu.txt 3 weights.txt sites.txt
         visualization/create_diagram weights.txt sites.txt intersections.txt
 

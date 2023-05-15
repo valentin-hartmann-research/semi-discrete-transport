@@ -18,7 +18,7 @@ to create the program `opt_transport`.
 
 
 ## Usage
-    opt_transport <-l/-g> <source> <target> [<normalizing factor for list target>] <weights> [<transport plan>]
+    opt_transport <-l/-g> <source> <target> [<normalizing factor for list target>] <weights> [<transport plan>] <regularization strength>
 
 - `<-l/-g>` - `-l` if the target measure is given as a `l`ist of points and `-g` if it is given as a pixel `g`rid. In the former situation you have to also set the normalizing factor, otherwise this argument must be omitted.
 - `<source>`, `<target>` - the files containing the masses of the source and target measure as described above
@@ -27,5 +27,6 @@ to create the program `opt_transport`.
 - `<transport plan>` (optional) - the file to which a rough transport plan should be printed. More precisely, the file will consist of three columns where each row has the format
         s t m
 and describes that according to the transport plan derived from the optimal weight vector an amount of `m` mass will be transported from somewhere on the pixel (of the source measure) with index `s` to the pixel (of the target measure) with index `t`.
+- `<regularization strength>` - the factor with which the L2-summand for stabilizing the optimization is multiplied. Higher value -> more stable, but less precise. Can usually be set to 0.
 
 To adjust the output of the program, define or undefine the preprocessor macros at the beginning of [opt_transport.cpp](opt_transport,cpp) and [Source.cpp](measures/Source.cpp).
