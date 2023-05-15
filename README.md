@@ -9,16 +9,13 @@ The software was tested on Ubuntu 17.04 but it should work on most other Linux d
 ## Installation
 The programs make use of several software components that need to be installed first. The compilation and usage of the individual programs in this repository is explained in the READMEs in the subdirectories.
 
-Open a shell window and install the following four packages by typing the corresponding command.
+Open a shell window and install the following three packages by typing the corresponding command.
 
-- CGAL for computing Voronoi diagrams
-        sudo apt-get install libcgal-dev
+- CGAL for computing Voronoi diagrams: `sudo apt-get install libcgal-dev`
 
-- libLBFGS for minimizing the convex function Phi
-        sudo apt-get install liblbfgs-dev
+- libLBFGS for minimizing the convex function Phi: `sudo apt-get install liblbfgs-dev`
 
-- CMake for compiling the sources
-        sudo apt-get install cmake
+- CMake for compiling the sources: `sudo apt-get install cmake`
 
 
 ## Typical workflow
